@@ -1,0 +1,12 @@
+{
+  "id": "pdf",
+  "name": "PDF Aracı",
+  "namespace": "core",
+  "version": "0.1.0",
+  "faz": 1,
+  "aktif": true,
+  "description": "Watermarksız PDF düzenleme ve dönüştürme: sayfa birleştirme/bölme/döndürme, Word/Excel/PowerPoint↔PDF dönüşümü, PDF↔görsel, damga/metin ekleme, form doldurma ve yapay zekâ destekli metin düzenleme.",
+  "module": "tools.pdf",
+  "ui_entry": "panel.js",
+  "requires_folder": false
+}
