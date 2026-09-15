@@ -25,6 +25,8 @@ const ICON_SPARK = "<svg viewBox='0 0 24 24' width='15' height='15' fill='none' 
 const ICON_EDIT_MODE = "<svg viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'/></svg>";
 const ICON_HIGHLIGHT = "<svg viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M9 11 12 14 22 4'/><path d='M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11'/></svg>";
 const ICON_NOTE = "<svg viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/></svg>";
+const ICON_IMAGE_BADGE = "<svg viewBox='0 0 24 24' width='17' height='17' fill='none' stroke='#fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='3'/><circle cx='9' cy='9' r='1.7' fill='#fff' stroke='none'/><path d='m21 15-5-5L5 21'/></svg>";
+const ICON_TEXT_BADGE = "<svg viewBox='0 0 24 24' width='17' height='17' fill='none' stroke='#fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7V4h16v3'/><path d='M9 20h6'/><path d='M12 4v16'/></svg>";
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -147,6 +149,27 @@ function ensureStyles() {
     .pdf-drop svg { flex-shrink:0; }
     .pdf-drop:hover { border-color:var(--pf-accent); color:var(--pf-accent-dark); }
     .pdf-drop input { display:none; }
+
+    /* ── Dönüştür sekmesi: teknik "başlık + tire tire çizgi" listesi yerine
+       sıcak, sohbet sekmesindeki avatar dilini (renkli rozet + harf)
+       kullanan kartlar — "çok teknik duruyor" geri bildirimi üzerine. ── */
+    .pdf-convert-intro { font-size:12.5px; color:var(--text-dim); margin:0 0 18px; line-height:1.5; }
+    .pdf-convert-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:22px; }
+    .pdf-convert-card {
+      border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--bg);
+      display:flex; flex-direction:column; gap:10px; transition:border-color .15s, box-shadow .15s;
+    }
+    .pdf-convert-card:hover { border-color:var(--pf-accent); box-shadow:0 2px 10px rgba(180,83,9,0.08); }
+    .pdf-convert-head { display:flex; align-items:center; gap:10px; }
+    .pdf-convert-badge {
+      width:34px; height:34px; border-radius:9px; flex-shrink:0; display:flex; align-items:center;
+      justify-content:center; font-size:13px; font-weight:700; color:#fff;
+    }
+    .pdf-convert-title { font-size:13px; font-weight:600; color:var(--text); margin:0; }
+    .pdf-convert-sub { font-size:11.5px; color:var(--text-dim); margin:0; line-height:1.5; }
+    .pdf-convert-card .pdf-drop { padding:16px; font-size:12px; margin-top:2px; }
+    .pdf-convert-card .pdf-row { margin:2px 0 0; }
+    .pdf-convert-note { font-size:11px; color:var(--text-dim); margin:2px 0 0; line-height:1.5; }
   `;
   document.head.appendChild(style);
 }
@@ -476,42 +499,78 @@ export function mount(container, api, toolId) {
           <img src="/api/tools/${toolId}/oturum/${oturum.id}/kucuk-resim/0?v=${Date.now()}&token=${encodeURIComponent(window.__AKTAPOKUS_TOKEN__ || '')}" style="cursor:zoom-in" title="Büyük önizleme için tıklayın">
         </div>
         <p class="hint" style="margin:4px 0 0">Aşağıdaki dönüştürme işlemleri bu aktif PDF (${oturum.sayfaSayisi} sayfa) üzerinde çalışır — indirmeden önce doğru belge olduğunu buradan kontrol edebilirsiniz.</p>
-      </div>` : ''}
-      <div class="pdf-section">
-        <h3>Office → PDF</h3>
-        <p class="hint">Word (.docx), Excel (.xlsx), PowerPoint (.pptx) ve benzeri belgeleri PDF'e çevirir (LibreOffice ile). Sonuç aktif oturuma alınır.</p>
-        <label class="pdf-drop" id="pdfDropOffice">${ICON_UPLOAD} Word / Excel / PowerPoint dosyası seçin<input type="file" accept=".doc,.docx,.odt,.xls,.xlsx,.ods,.ppt,.pptx,.odp,.rtf,.txt" id="pdfFileOffice"></label>
-      </div>
-      <div class="pdf-section">
-        <h3>Görsellerden PDF Oluştur</h3>
-        <label class="pdf-drop" id="pdfDropGorselPdf">${ICON_UPLOAD} Bir veya birden fazla görsel seçin (jpg/png)<input type="file" accept="image/*" multiple id="pdfFileGorselPdf"></label>
-      </div>
-      ${oturum ? `
-      <div class="pdf-section">
-        <h3>PDF → Office</h3>
-        <p class="hint">Yaklaşık dönüşüm — düzen/biçim tam olarak korunmayabilir (LibreOffice sınırı).</p>
-        <div class="pdf-row">
-          <select id="pdfHedefFormat">
-            <option value="docx">Word (.docx)</option>
-            <option value="xlsx">Excel (.xlsx) — sadece tablolar</option>
-            <option value="pptx">PowerPoint (.pptx) — sayfa görseli olarak</option>
-          </select>
-          <button class="btn-secondary" id="pdfToOfficeBtn">Dönüştür ve İndir</button>
+      </div>` : `<p class="pdf-convert-intro">Elinizdeki dosyayı PDF'e çevirin, ya da bir PDF yükleyip başka bir formata dönüştürün — hangisi olursa olsun aşağıdan başlayabilirsiniz.</p>`}
+
+      <div class="pdf-convert-grid">
+        <div class="pdf-convert-card">
+          <div class="pdf-convert-head">
+            <div class="pdf-convert-badge" style="background:#2B579A">W</div>
+            <div>
+              <p class="pdf-convert-title">Word, Excel, PowerPoint…</p>
+              <p class="pdf-convert-sub">Elinizdeki ofis belgesini PDF'e çevirir.</p>
+            </div>
+          </div>
+          <label class="pdf-drop" id="pdfDropOffice">${ICON_UPLOAD} Dosyayı buraya sürükleyin ya da seçin<input type="file" accept=".doc,.docx,.odt,.xls,.xlsx,.ods,.ppt,.pptx,.odp,.rtf,.txt" id="pdfFileOffice"></label>
         </div>
-      </div>
-      <div class="pdf-section">
-        <h3>PDF → Görsel</h3>
-        <div class="pdf-row">
-          <label>DPI</label>
-          <input type="number" id="pdfDpi" value="150" min="72" max="400" style="width:70px">
-          <button class="btn-secondary" id="pdfToImgBtn">Tüm Sayfaları PNG Olarak İndir (ZIP)</button>
+
+        <div class="pdf-convert-card">
+          <div class="pdf-convert-head">
+            <div class="pdf-convert-badge" style="background:#7C3AED">${ICON_IMAGE_BADGE}</div>
+            <div>
+              <p class="pdf-convert-title">Fotoğraflardan PDF</p>
+              <p class="pdf-convert-sub">Birkaç JPG/PNG'yi tek bir PDF'te, seçtiğiniz sırayla birleştirir.</p>
+            </div>
+          </div>
+          <label class="pdf-drop" id="pdfDropGorselPdf">${ICON_UPLOAD} Bir veya birden fazla görsel seçin<input type="file" accept="image/*" multiple id="pdfFileGorselPdf"></label>
         </div>
+
+        ${oturum ? `
+        <div class="pdf-convert-card">
+          <div class="pdf-convert-head">
+            <div class="pdf-convert-badge" style="background:var(--pf-accent)">PDF</div>
+            <div>
+              <p class="pdf-convert-title">Düzenlenebilir hale getirin</p>
+              <p class="pdf-convert-sub">Aktif PDF'i Word, Excel ya da PowerPoint olarak indirin.</p>
+            </div>
+          </div>
+          <div class="pdf-row">
+            <select id="pdfHedefFormat">
+              <option value="docx">Word (.docx)</option>
+              <option value="xlsx">Excel (.xlsx) — sadece tablolar</option>
+              <option value="pptx">PowerPoint (.pptx) — sayfa görseli olarak</option>
+            </select>
+            <button class="btn-secondary" id="pdfToOfficeBtn">Dönüştür ve İndir</button>
+          </div>
+          <p class="pdf-convert-note">Yaklaşık bir dönüşümdür — karmaşık sayfalarda biçim küçük farklar gösterebilir.</p>
+        </div>
+
+        <div class="pdf-convert-card">
+          <div class="pdf-convert-head">
+            <div class="pdf-convert-badge" style="background:#0F766E">${ICON_IMAGE_BADGE}</div>
+            <div>
+              <p class="pdf-convert-title">Sayfaları görsele çevirin</p>
+              <p class="pdf-convert-sub">Her sayfa ayrı bir PNG olarak, hepsi tek bir ZIP içinde.</p>
+            </div>
+          </div>
+          <div class="pdf-row">
+            <label>Netlik (DPI)</label>
+            <input type="number" id="pdfDpi" value="150" min="72" max="400" style="width:70px">
+            <button class="btn-secondary" id="pdfToImgBtn">İndir (ZIP)</button>
+          </div>
+        </div>
+
+        <div class="pdf-convert-card">
+          <div class="pdf-convert-head">
+            <div class="pdf-convert-badge" style="background:#475569">${ICON_TEXT_BADGE}</div>
+            <div>
+              <p class="pdf-convert-title">Sadece metni alın</p>
+              <p class="pdf-convert-sub">Biçimlendirmesiz, düz metin olarak indirin ya da burada okuyun.</p>
+            </div>
+          </div>
+          <button class="btn-secondary" id="pdfToTextBtn">Metni İndir (.txt)</button>
+          <div id="pdfMetinOnizleme"></div>
+        </div>` : ''}
       </div>
-      <div class="pdf-section">
-        <h3>PDF → Düz Metin</h3>
-        <button class="btn-secondary" id="pdfToTextBtn">Metni İndir (.txt)</button>
-        <div id="pdfMetinOnizleme"></div>
-      </div>` : ''}
     `;
     bindSessionBar();
 
