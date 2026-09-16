@@ -499,16 +499,36 @@ export function mount(container, api, toolId) {
         <div class="pdf-thumb" id="pdfDonusturOnizlemeKart" style="width:110px;flex-shrink:0">
           <img src="/api/tools/${toolId}/oturum/${oturum.id}/kucuk-resim/0?v=${Date.now()}&token=${encodeURIComponent(window.__AKTAPOKUS_TOKEN__ || '')}" style="cursor:zoom-in" title="Büyük önizleme için tıklayın">
         </div>
-        <p class="hint" style="margin:4px 0 0">Aşağıdaki dönüştürme işlemleri bu aktif PDF (${oturum.sayfaSayisi} sayfa) üzerinde çalışır — indirmeden önce doğru belge olduğunu buradan kontrol edebilirsiniz.</p>
+        <p class="hint" style="margin:4px 0 0">Aşağıdaki dönüştürme işlemleri bu aktif PDF'in TAMAMI (${oturum.sayfaSayisi} sayfa) üzerinde çalışır — soldaki küçük resim sadece 1. sayfanın önizlemesi, hangi belge olduğunu buradan kontrol edebilirsiniz.</p>
       </div>` : `<p class="pdf-convert-intro">Elinizdeki dosyayı PDF'e çevirin, ya da bir PDF yükleyip başka bir formata dönüştürün — hangisi olursa olsun aşağıdan başlayabilirsiniz.</p>`}
 
       <div class="pdf-convert-grid">
+        ${oturum ? `
+        <div class="pdf-convert-card">
+          <div class="pdf-convert-head">
+            <div class="pdf-convert-badge" style="background:var(--pf-accent)">PDF</div>
+            <div>
+              <p class="pdf-convert-title">Düzenlenebilir hale getirin</p>
+              <p class="pdf-convert-sub">Aktif PDF'inizi (yeniden yüklemenize gerek yok) Word, Excel ya da PowerPoint olarak indirin.</p>
+            </div>
+          </div>
+          <div class="pdf-row">
+            <select id="pdfHedefFormat">
+              <option value="docx">Word (.docx)</option>
+              <option value="xlsx">Excel (.xlsx) — sadece tablolar</option>
+              <option value="pptx">PowerPoint (.pptx) — sayfa görseli olarak</option>
+            </select>
+            <button class="btn-secondary" id="pdfToOfficeBtn">Dönüştür ve İndir</button>
+          </div>
+          <p class="pdf-convert-note">Yaklaşık bir dönüşümdür — karmaşık sayfalarda biçim küçük farklar gösterebilir.</p>
+        </div>` : ''}
+
         <div class="pdf-convert-card">
           <div class="pdf-convert-head">
             <div class="pdf-convert-badge" style="background:#2B579A">W</div>
             <div>
               <p class="pdf-convert-title">Word, Excel, PowerPoint…</p>
-              <p class="pdf-convert-sub">Elinizdeki ofis belgesini PDF'e çevirir.</p>
+              <p class="pdf-convert-sub">Elinizdeki ofis belgesini PDF'e çevirir. (PDF'iniz zaten var mı? Bu kutu değil, ${oturum ? 'yukarıdaki' : 'bir PDF yükledikten sonra çıkacak'} "Düzenlenebilir hale getirin" kartını kullanın.)</p>
             </div>
           </div>
           <label class="pdf-drop" id="pdfDropOffice">${ICON_UPLOAD} Dosyayı buraya sürükleyin ya da seçin<input type="file" accept=".doc,.docx,.odt,.xls,.xlsx,.ods,.ppt,.pptx,.odp,.rtf,.txt" id="pdfFileOffice"></label>
@@ -526,25 +546,6 @@ export function mount(container, api, toolId) {
         </div>
 
         ${oturum ? `
-        <div class="pdf-convert-card">
-          <div class="pdf-convert-head">
-            <div class="pdf-convert-badge" style="background:var(--pf-accent)">PDF</div>
-            <div>
-              <p class="pdf-convert-title">Düzenlenebilir hale getirin</p>
-              <p class="pdf-convert-sub">Aktif PDF'i Word, Excel ya da PowerPoint olarak indirin.</p>
-            </div>
-          </div>
-          <div class="pdf-row">
-            <select id="pdfHedefFormat">
-              <option value="docx">Word (.docx)</option>
-              <option value="xlsx">Excel (.xlsx) — sadece tablolar</option>
-              <option value="pptx">PowerPoint (.pptx) — sayfa görseli olarak</option>
-            </select>
-            <button class="btn-secondary" id="pdfToOfficeBtn">Dönüştür ve İndir</button>
-          </div>
-          <p class="pdf-convert-note">Yaklaşık bir dönüşümdür — karmaşık sayfalarda biçim küçük farklar gösterebilir.</p>
-        </div>
-
         <div class="pdf-convert-card">
           <div class="pdf-convert-head">
             <div class="pdf-convert-badge" style="background:#0F766E">${ICON_IMAGE_BADGE}</div>
@@ -577,6 +578,21 @@ export function mount(container, api, toolId) {
 
     bodyEl.querySelector('#pdfFileOffice').onchange = async e => {
       const dosya = e.target.files[0]; if (!dosya) return;
+      if (/\.pdf$/i.test(dosya.name)) {
+        // "Desteklenmeyen kaynak format: '.pdf'" ham backend hatası
+        // kullanıcıyı yanlış yöne itiyordu ("dönüştür diye bir buton yok" /
+        // "çeviremiyorum" şikayetleri buradan geliyordu) — bu kutu PDF
+        // ÜRETİR, PDF'İ GİRDİ olarak almaz. Kullanıcı burada aslında elinde
+        // PDF varken onu Word'e çevirmeye çalışıyordu; doğru yere yönlendir.
+        e.target.value = '';
+        api.gosterfeedback(
+          oturum
+            ? 'Bu kutu PDF oluşturur, PDF açmaz. PDF\'inizi Word\'e çevirmek için yukarıdaki "Düzenlenebilir hale getirin" kartını kullanın.'
+            : 'Bu kutu PDF oluşturur, PDF açmaz. PDF\'inizi Word\'e çevirmek için önce "Sayfalar" sekmesinden PDF\'i yükleyin, sonra bu sayfada beliren "Düzenlenebilir hale getirin" kartını kullanın.',
+          'err'
+        );
+        return;
+      }
       const fd = new FormData(); fd.append('file', dosya);
       api.spinnerGoster('LibreOffice ile dönüştürülüyor…');
       try {
