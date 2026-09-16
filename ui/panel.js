@@ -425,12 +425,13 @@ export function mount(container, api, toolId) {
         <h3>Sayfa Düzeni</h3>
         <div class="pdf-thumbs" id="pdfThumbs"></div>
         <button class="btn-primary" id="pdfPlanUygulaBtn">Değişiklikleri Uygula</button>
-      </div>
+      </div>` : ''}
       <div class="pdf-section">
         <h3>Birden Fazla PDF'i Birleştir</h3>
-        <p class="hint">Seçtiğiniz dosyalar seçim sırasına göre tek bir PDF'te birleştirilir ve aktif oturuma alınır.</p>
+        <p class="hint">Seçtiğiniz dosyalar seçim sırasına göre tek bir PDF'te birleştirilir ve aktif oturuma alınır. Bir PDF yüklemiş olmanız gerekmez — buradan sıfırdan başlayabilirsiniz.</p>
         <label class="pdf-drop" id="pdfDropBirlestir">${ICON_UPLOAD} Birleştirilecek PDF'leri seçin (2+)<input type="file" accept="application/pdf" multiple id="pdfFileBirlestir"></label>
       </div>
+      ${oturum ? `
       <div class="pdf-section">
         <h3>Böl</h3>
         <p class="hint">Sayfa aralığı girin (ör. "1-3,5,7-9") ya da her sayfayı ayrı bir dosyaya ayırın. Sonuç bir ZIP olarak iner.</p>
