@@ -10,9 +10,9 @@
 
 const STYLE_ID = 'pdf-panel-style';
 const AYIRICI = '\n---AKTAPOKUS_PDF_OTURUM---\n';
-const ACCENT = '#B45309';
-const ACCENT_DARK = '#92400E';
-const ACCENT_LIGHT = '#FEF3C7';
+const ACCENT = 'var(--blue)';       // cekirdek aksani (tum araclarda ayni sari)
+const ACCENT_DARK = 'var(--blue-dim)';
+const ACCENT_LIGHT = 'var(--blue-light)';
 
 const ICON_UPLOAD = "<svg viewBox='0 0 24 24' width='15' height='15' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' style='vertical-align:-2px'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='17 8 12 3 7 8'/><line x1='12' y1='3' x2='12' y2='15'/></svg>";
 const ICON_DOWNLOAD = "<svg viewBox='0 0 24 24' width='15' height='15' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' style='vertical-align:-2px'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/></svg>";
@@ -25,8 +25,8 @@ const ICON_SPARK = "<svg viewBox='0 0 24 24' width='15' height='15' fill='none' 
 const ICON_EDIT_MODE = "<svg viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'/></svg>";
 const ICON_HIGHLIGHT = "<svg viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M9 11 12 14 22 4'/><path d='M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11'/></svg>";
 const ICON_NOTE = "<svg viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/></svg>";
-const ICON_IMAGE_BADGE = "<svg viewBox='0 0 24 24' width='17' height='17' fill='none' stroke='#fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='3'/><circle cx='9' cy='9' r='1.7' fill='#fff' stroke='none'/><path d='m21 15-5-5L5 21'/></svg>";
-const ICON_TEXT_BADGE = "<svg viewBox='0 0 24 24' width='17' height='17' fill='none' stroke='#fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7V4h16v3'/><path d='M9 20h6'/><path d='M12 4v16'/></svg>";
+const ICON_IMAGE_BADGE = "<svg viewBox='0 0 24 24' width='17' height='17' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='3'/><circle cx='9' cy='9' r='1.7' fill='#fff' stroke='none'/><path d='m21 15-5-5L5 21'/></svg>";
+const ICON_TEXT_BADGE = "<svg viewBox='0 0 24 24' width='17' height='17' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7V4h16v3'/><path d='M9 20h6'/><path d='M12 4v16'/></svg>";
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -44,11 +44,11 @@ function ensureStyles() {
     .pdf-tabs { display:flex; gap:1px; padding:10px 16px 0; border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap; }
     .pdf-tab { font-size:12px; font-weight:500; padding:8px 14px; border:1px solid var(--border); border-bottom:none;
       background:var(--bg); color:var(--text-dim); cursor:pointer; border-radius:6px 6px 0 0; }
-    .pdf-tab:hover { color:var(--pf-accent-dark); }
-    .pdf-tab.active { background:var(--pf-accent); border-color:var(--pf-accent); color:#fff; }
+    .pdf-tab:hover { color:var(--blue-text,#7A5800); }
+    .pdf-tab.active { background:var(--pf-accent); border-color:var(--pf-accent); color: var(--on-accent,#141412); }
     .pdf-body { flex:1; min-height:0; overflow-y:auto; padding:18px; }
     .pdf-session-bar { display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:16px;
-      background:var(--pf-accent-light); border:1px solid var(--pf-accent); border-radius:6px; font-size:12px; color:var(--pf-accent-dark); flex-wrap:wrap; }
+      background:var(--pf-accent-light); border:1px solid var(--pf-accent); border-radius:6px; font-size:12px; color:var(--blue-text,#7A5800); flex-wrap:wrap; }
     .pdf-session-bar.empty { background:var(--surface-2,#F2F1EC); border-color:var(--border); color:var(--text-dim); }
     .pdf-session-bar button:disabled { opacity:.4; cursor:not-allowed; }
     .pdf-session-omur { margin-left:auto; font-size:11px; opacity:.75; }
@@ -68,10 +68,10 @@ function ensureStyles() {
     .pdf-thumb-foot { display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11px; color:var(--text-dim); }
     .pdf-thumb-btns { display:flex; gap:4px; }
     .pdf-thumb-btns button { background:none; border:1px solid var(--border); border-radius:4px; padding:3px 5px; cursor:pointer; color:var(--text-dim); }
-    .pdf-thumb-btns button:hover { color:var(--pf-accent-dark); border-color:var(--pf-accent); }
+    .pdf-thumb-btns button:hover { color:var(--blue-text,#7A5800); border-color:var(--pf-accent); }
     .pdf-thumb.removed { opacity:.35; }
     .pdf-plan-item { padding:10px 12px; border:1px solid var(--border); border-radius:6px; margin-bottom:8px; font-size:12.5px; display:flex; gap:10px; align-items:flex-start; }
-    .pdf-plan-item .reason { color:var(--pf-accent-dark); font-weight:500; }
+    .pdf-plan-item .reason { color:var(--blue-text,#7A5800); font-weight:500; }
     .pdf-plan-item .quote { color:var(--text-dim); font-style:italic; margin-top:3px; }
     .pdf-preview-scroll { overflow:auto; border:1px solid var(--border); border-radius:8px; margin:10px 0; max-height:75vh; background:var(--surface-2,#F2F1EC); }
     .pdf-preview-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:18px; }
@@ -80,13 +80,13 @@ function ensureStyles() {
     .pdf-sayfa-etiket { font-size:11px; color:var(--text-dim); margin:0 0 4px 2px; }
     .pdf-zoom-cubugu { display:flex; align-items:center; gap:6px; margin:8px 0; }
     .pdf-zoom-cubugu button { width:28px; height:28px; border:1px solid var(--border); border-radius:5px; background:var(--bg); color:var(--text); font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    .pdf-zoom-cubugu button:hover { border-color:var(--pf-accent); color:var(--pf-accent-dark); }
+    .pdf-zoom-cubugu button:hover { border-color:var(--pf-accent); color:var(--blue-text,#7A5800); }
     .pdf-zoom-cubugu #pdfZoomSifirla { width:auto; padding:0 10px; font-size:11px; }
     .pdf-zoom-cubugu #pdfZoomDeger { font-size:12px; color:var(--text-dim); min-width:42px; text-align:center; }
-    .pdf-line-box { position:absolute; box-sizing:border-box; border:1px dashed rgba(180,83,9,0.35); border-radius:2px; pointer-events:none; transition:background .1s,border-color .1s; }
-    .pdf-line-box.hover { background:rgba(180,83,9,0.20); border-color:var(--pf-accent); border-style:solid; }
-    .pdf-line-box.selected { background:rgba(180,83,9,0.30); border-color:var(--pf-accent-dark); }
-    .pdf-line-box.secili { background:rgba(255,213,0,0.55); border-color:#b45309; border-style:solid; }
+    .pdf-line-box { position:absolute; box-sizing:border-box; border:1px dashed rgba(217,169,0,0.35); border-radius:2px; pointer-events:none; transition:background .1s,border-color .1s; }
+    .pdf-line-box.hover { background:rgba(217,169,0,0.20); border-color:var(--pf-accent); border-style:solid; }
+    .pdf-line-box.selected { background:rgba(217,169,0,0.30); border-color:var(--pf-accent-dark); }
+    .pdf-line-box.secili { background:rgba(255,213,0,0.55); border-color:var(--sari-koyu,#D9A900); border-style:solid; }
     .pdf-not-ikon {
       position:absolute; width:10px; height:10px; margin:-10px 0 0 0;
       background:#dc2626; clip-path:polygon(0 0, 100% 0, 100% 100%);
@@ -108,8 +108,8 @@ function ensureStyles() {
     .pdf-mod-cubugu { display:flex; gap:6px; margin:10px 0; flex-wrap:wrap; }
     .pdf-mod-btn { display:flex; align-items:center; gap:6px; padding:8px 12px; border:1px solid var(--border); border-radius:7px;
       background:var(--bg); color:var(--text-dim); font-size:12px; font-weight:500; cursor:pointer; }
-    .pdf-mod-btn:hover { border-color:var(--pf-accent); color:var(--pf-accent-dark); }
-    .pdf-mod-btn.active { background:var(--pf-accent); border-color:var(--pf-accent); color:#fff; }
+    .pdf-mod-btn:hover { border-color:var(--pf-accent); color:var(--blue-text,#7A5800); }
+    .pdf-mod-btn.active { background:var(--pf-accent); border-color:var(--pf-accent); color: var(--on-accent,#141412); }
     .pdf-mod-cubugu.vertical { flex-direction:column; margin-top:0; }
     .pdf-mod-cubugu.vertical .pdf-mod-btn { width:100%; }
     .pdf-duzenle-layout { display:flex; gap:16px; align-items:flex-start; }
@@ -139,15 +139,15 @@ function ensureStyles() {
     .pdf-modal-box img { max-width:100%; display:block; }
     .pdf-modal-box .pdf-row { margin-bottom:10px; }
     .pdf-feedback-inline { font-size:12px; padding:8px 10px; border-radius:5px; margin-top:8px; }
-    .pdf-feedback-inline.err { background:#FEF2F2; border:1px solid #FECACA; color:#B91C1C; }
-    .pdf-feedback-inline.ok { background:#F0FDF4; border:1px solid #BBF7D0; color:#15803D; }
+    .pdf-feedback-inline.err { background:var(--red-light,#FEF2F2); border:1px solid var(--red-light,#FECACA); color:var(--red,#B91C1C); }
+    .pdf-feedback-inline.ok { background:var(--green-light,#F0FDF4); border:1px solid var(--green-light,#BBF7D0); color:var(--green,#15803D); }
     .pdf-drop {
       display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
       border:1.5px dashed var(--border); border-radius:8px; padding:22px; text-align:center;
       color:var(--text-dim); font-size:12.5px; cursor:pointer;
     }
     .pdf-drop svg { flex-shrink:0; }
-    .pdf-drop:hover { border-color:var(--pf-accent); color:var(--pf-accent-dark); }
+    .pdf-drop:hover { border-color:var(--pf-accent); color:var(--blue-text,#7A5800); }
     .pdf-drop input { display:none; }
 
     /* ── Dönüştür sekmesi: teknik "başlık + tire tire çizgi" listesi yerine
@@ -159,11 +159,11 @@ function ensureStyles() {
       border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--bg);
       display:flex; flex-direction:column; gap:10px; transition:border-color .15s, box-shadow .15s;
     }
-    .pdf-convert-card:hover { border-color:var(--pf-accent); box-shadow:0 2px 10px rgba(180,83,9,0.08); }
+    .pdf-convert-card:hover { border-color:var(--pf-accent); box-shadow:0 2px 10px rgba(217,169,0,0.08); }
     .pdf-convert-head { display:flex; align-items:center; gap:10px; }
     .pdf-convert-badge {
       width:34px; height:34px; border-radius:9px; flex-shrink:0; display:flex; align-items:center;
-      justify-content:center; font-size:13px; font-weight:700; color:#fff;
+      justify-content:center; font-size:13px; font-weight:700; color:var(--on-accent,#141412); background:var(--blue);
     }
     .pdf-convert-title { font-size:13px; font-weight:600; color:var(--text); margin:0; }
     .pdf-convert-sub { font-size:11.5px; color:var(--text-dim); margin:0; line-height:1.5; }
@@ -525,7 +525,7 @@ export function mount(container, api, toolId) {
 
         <div class="pdf-convert-card">
           <div class="pdf-convert-head">
-            <div class="pdf-convert-badge" style="background:#2B579A">W</div>
+            <div class="pdf-convert-badge" style="">W</div>
             <div>
               <p class="pdf-convert-title">Word, Excel, PowerPoint…</p>
               <p class="pdf-convert-sub">Elinizdeki ofis belgesini PDF'e çevirir. (PDF'iniz zaten var mı? Bu kutu değil, ${oturum ? 'yukarıdaki' : 'bir PDF yükledikten sonra çıkacak'} "Düzenlenebilir hale getirin" kartını kullanın.)</p>
@@ -536,7 +536,7 @@ export function mount(container, api, toolId) {
 
         <div class="pdf-convert-card">
           <div class="pdf-convert-head">
-            <div class="pdf-convert-badge" style="background:#7C3AED">${ICON_IMAGE_BADGE}</div>
+            <div class="pdf-convert-badge" style="">${ICON_IMAGE_BADGE}</div>
             <div>
               <p class="pdf-convert-title">Fotoğraflardan PDF</p>
               <p class="pdf-convert-sub">Birkaç JPG/PNG'yi tek bir PDF'te, seçtiğiniz sırayla birleştirir.</p>
@@ -548,7 +548,7 @@ export function mount(container, api, toolId) {
         ${oturum ? `
         <div class="pdf-convert-card">
           <div class="pdf-convert-head">
-            <div class="pdf-convert-badge" style="background:#0F766E">${ICON_IMAGE_BADGE}</div>
+            <div class="pdf-convert-badge" style="">${ICON_IMAGE_BADGE}</div>
             <div>
               <p class="pdf-convert-title">Sayfaları görsele çevirin</p>
               <p class="pdf-convert-sub">Her sayfa ayrı bir PNG olarak, hepsi tek bir ZIP içinde.</p>
@@ -563,7 +563,7 @@ export function mount(container, api, toolId) {
 
         <div class="pdf-convert-card">
           <div class="pdf-convert-head">
-            <div class="pdf-convert-badge" style="background:#475569">${ICON_TEXT_BADGE}</div>
+            <div class="pdf-convert-badge" style="">${ICON_TEXT_BADGE}</div>
             <div>
               <p class="pdf-convert-title">Sadece metni alın</p>
               <p class="pdf-convert-sub">Biçimlendirmesiz, düz metin olarak indirin ya da burada okuyun.</p>
